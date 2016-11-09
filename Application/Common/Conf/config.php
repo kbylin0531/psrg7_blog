@@ -6,12 +6,12 @@ return array(
     'TAGLIB_BUILD_IN'       =>  'Cx,Common\Tag\My',           //加载自定义标签
     'LOAD_EXT_CONFIG'       =>  'db,webconfig,oauth',         //加载网站设置文件
     'TMPL_PARSE_STRING'     =>  array(                        //定义常用路径
-        '__HOME_CSS__'      =>  __ROOT__.trim(TMPL_PATH,'.').'Home/Public/css',
-        '__HOME_JS__'       =>  __ROOT__.trim(TMPL_PATH,'.').'Home/Public/js',
-        '__HOME_IMAGE__'    =>  __ROOT__.trim(TMPL_PATH,'.').'Home/Public/image',
-        '__ADMIN_CSS__'     =>  __ROOT__.trim(TMPL_PATH,'.').'Admin/Public/css',
-        '__ADMIN_JS__'      =>  __ROOT__.trim(TMPL_PATH,'.').'Admin/Public/js',
-        '__ADMIN_IMAGE__'   =>  __ROOT__.trim(TMPL_PATH,'.').'Admin/Public/image',
+        '__HOME_CSS__'      =>  SR_PUBLIC_URL.'Public/static/app/home/css',
+        '__HOME_JS__'       =>  SR_PUBLIC_URL.'Public/static/app/home/js',
+        '__HOME_IMAGE__'    =>  SR_PUBLIC_URL.'Public/static/app/home/image',
+        '__ADMIN_CSS__'     =>  SR_PUBLIC_URL.'Public/static/app/admin/css',
+        '__ADMIN_JS__'      =>  SR_PUBLIC_URL.'Public/static/app/admin/js',
+        '__ADMIN_IMAGE__'   =>  SR_PUBLIC_URL.'Public/static/app/admin/image',
     ),
 //***********************************URL设置*********************************
     'MODULE_ALLOW_LIST'     =>  array('Home','Admin','Api'),  //允许访问列表
