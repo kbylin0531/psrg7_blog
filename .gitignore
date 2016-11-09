@@ -1,0 +1,6 @@
+Runtime/
+install.lock
+Application/Common/Conf/db.php
+node_modules/
+Sharin
+.idea
