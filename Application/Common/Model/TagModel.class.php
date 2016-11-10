@@ -1,6 +1,5 @@
 <?php
 namespace Common\Model;
-use Common\Model\BaseModel;
 /**
 * 标签model
 */
@@ -72,6 +71,7 @@ Class TagModel extends BaseModel{
      * @return array $tnames 标签名
      */
     public function getTnames($tids){
+        $tnames = [];
         foreach ($tids as $k => $v) {
             $tnames[]=$this->where(array('tid'=>$v))->getField('tname');
         }
