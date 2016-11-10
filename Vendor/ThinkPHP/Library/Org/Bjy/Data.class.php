@@ -19,7 +19,7 @@ final class Data
 {
     /**
      * 返回多层栏目
-     * @param $data 操作的数组
+     * @param array $data 操作的数组
      * @param int $pid 一级PID的值
      * @param string $html 栏目名称前缀
      * @param string $fieldPri 唯一键名，如果是表则是表的主键
@@ -46,7 +46,7 @@ final class Data
 
     /**
      * 获得所有子栏目
-     * @param $data 栏目数据
+     * @param array $data 栏目数据
      * @param int $pid 操作的栏目
      * @param string $html 栏目名前字符
      * @param string $fieldPri 表主键
@@ -65,16 +65,16 @@ final class Data
             $data[$n]['_first'] = false;
             $data[$n]['_end'] = false;
             if (!isset($data[$n - 1]) || $data[$n - 1]['_level'] != $m['_level']) {
-                $data[$n]['_first'] = true; 
+                $data[$n]['_first'] = true;
             }
             if (isset($data[$n + 1]) && $data[$n]['_level'] > $data[$n + 1]['_level']) {
                 $data[$n]['_end'] = true;
             }
         }
         //更新key为栏目主键
-        $category=array();
-        foreach($data as $d){
-            $category[$d[$fieldPri]]=$d;
+        $category = array();
+        foreach ($data as $d) {
+            $category[$d[$fieldPri]] = $d;
         }
         return $category;
     }
@@ -100,8 +100,8 @@ final class Data
 
     /**
      * 获得树状数据
-     * @param $data 数据
-     * @param $title 字段名
+     * @param mixed $data 数据
+     * @param string $title 字段名
      * @param string $fieldPri 主键id
      * @param string $fieldPid 父id
      * @return array
@@ -139,8 +139,8 @@ final class Data
 
     /**
      * 获得所有父级栏目
-     * @param $data 栏目数据
-     * @param $sid 子栏目
+     * @param array $data 栏目数据
+     * @param int $sid 子栏目
      * @param string $fieldPri 唯一键名，如果是表则是表的主键
      * @param string $fieldPid 父ID键名
      * @return array
@@ -166,9 +166,9 @@ final class Data
 
     /**
      * 判断$s_cid是否是$d_cid的子栏目
-     * @param $data 栏目数据
-     * @param $sid 子栏目id
-     * @param $pid 父栏目id
+     * @param array $data 栏目数据
+     * @param int $sid 子栏目id
+     * @param int $pid 父栏目id
      * @param string $fieldPri 主键
      * @param string $fieldPid 父id字段
      * @return bool
@@ -186,8 +186,8 @@ final class Data
 
     /**
      * 检测是不否有子栏目
-     * @param $data 栏目数据
-     * @param $cid 要判断的栏目cid
+     * @param array $data 栏目数据
+     * @param int $cid 要判断的栏目cid
      * @param string $fieldPid 父id表字段名
      * @return bool
      */
@@ -201,7 +201,7 @@ final class Data
 
     /**
      * 递归实现迪卡尔乘积
-     * @param $arr 操作的数组
+     * @param array $arr 操作的数组
      * @param array $tmp
      * @return array
      */

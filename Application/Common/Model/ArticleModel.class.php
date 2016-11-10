@@ -1,10 +1,12 @@
 <?php
 namespace Common\Model;
 
-use Common\Model\BaseModel;
+use Org\Bjy\Page;
 
 /**
  * 文章model
+ * @method ArticleModel getInstance() static
+ * @method array|int|string getFieldByAid(int $aid,string $field)
  */
 class ArticleModel extends BaseModel
 {
@@ -67,7 +69,7 @@ class ArticleModel extends BaseModel
             $image_path = get_ueditor_image_path($data['content']);
             if ($aid = $this->add()) {
                 if (isset($data['tids'])) {
-                    D('ArticleTag')->addData($aid, $data['tids']);
+                    ArticleTagModel::getInstance()->addData($aid, $data['tids']);
                 }
                 if (!empty($image_path)) {
                     // 添加水印
@@ -77,7 +79,7 @@ class ArticleModel extends BaseModel
                         }
                     }
                     // 传递图片插入数据库
-                    D('ArticlePic')->addData($aid, $image_path);
+                    ArticlePicModel::getInstance()->addData($aid, $image_path);
                 }
                 // 获取未删除和展示的文章
                 $sitemap_map = array(
@@ -126,12 +128,12 @@ class ArticleModel extends BaseModel
             $aid = $data['aid'];
             $this->where(array('aid' => $aid))->save();
             $image_path = get_ueditor_image_path($data['content']);
-            D('ArticleTag')->deleteData($aid);
+            ArticleTagModel::getInstance()->deleteData($aid);
             if (isset($data['tids'])) {
-                D('ArticleTag')->addData($aid, $data['tids']);
+                ArticleTagModel::getInstance()->addData($aid, $data['tids']);
             }
             // 删除图片路径
-            D('ArticlePic')->deleteData($aid);
+            ArticlePicModel::getInstance()->deleteData($aid);
             if (!empty($image_path)) {
                 if (C('WATER_TYPE') != 0) {
                     foreach ($image_path as $k => $v) {
@@ -139,7 +141,7 @@ class ArticleModel extends BaseModel
                     }
                 }
                 // 添加新图片路径
-                D('ArticlePic')->addData($aid, $image_path);
+                ArticlePicModel::getInstance()->addData($aid, $image_path);
             }
             return true;
         } else {
@@ -151,19 +153,21 @@ class ArticleModel extends BaseModel
     public function deleteData()
     {
         $aid = I('get.aid', 0, 'intval');
-        D('ArticlePic')->deleteData($aid);
-        D('ArticleTag')->deleteData($aid);
+        ArticlePicModel::getInstance()->deleteData($aid);
+        ArticleTagModel::getInstance()->deleteData($aid);
         $this->where(array('aid' => $aid))->delete();
         return true;
     }
 
     /**
      * 获得文章分页数据
-     * @param strind $cid 分类id 'all'为全部分类
-     * @param strind $tid 标签id 'all'为全部标签
-     * @param strind $is_delete 状态 1为删除 0为正常
-     * @param strind $limit 分页条数
+     * @param string $cid 分类id 'all'为全部分类
+     * @param string $tid 标签id 'all'为全部标签
+     * @param string $is_show
+     * @param int $is_delete 状态 1为删除 0为正常
+     * @param int $limit 分页条数
      * @return array $data 分页样式 和 分页数据
+     * @return array
      */
     public function getPageData($cid = 'all', $tid = 'all', $is_show = '1', $is_delete = 0, $limit = 10)
     {
@@ -182,7 +186,7 @@ class ArticleModel extends BaseModel
             $count = $this
                 ->where($where)
                 ->count();
-            $page = new \Org\Bjy\Page($count, $limit);
+            $page = new Page($count, $limit);
             $list = $this
                 ->where($where)
                 ->order('addtime desc')
@@ -206,13 +210,14 @@ class ArticleModel extends BaseModel
                     'a.is_show' => $is_show
                 );
             }
-            $count = M('article_tag')
+
+            $count = ArticleTagModel::getInstance()
                 ->alias('at')
                 ->join('__ARTICLE__ a ON at.aid=a.aid')
                 ->where($where)
                 ->count();
-            $page = new \Org\Bjy\Page($count, $limit);
-            $list = M('article_tag')
+            $page = new Page($count, $limit);
+            $list = ArticleTagModel::getInstance()
                 ->alias('at')
                 ->join('__ARTICLE__ a ON at.aid=a.aid')
                 ->where($where)
@@ -240,7 +245,7 @@ class ArticleModel extends BaseModel
             $count = $this
                 ->where($where)
                 ->count();
-            $page = new \Org\Bjy\Page($count, $limit);
+            $page = new Page($count, $limit);
             $list = $this
                 ->where($where)
                 ->order('addtime desc')
@@ -250,12 +255,14 @@ class ArticleModel extends BaseModel
                 'type' => 'cid',
                 'id' => $cid
             );
+        } else {
+            return [];
         }
         $show = $page->show();
         foreach ($list as $k => $v) {
-            $list[$k]['tag'] = D('ArticleTag')->getDataByAid($v['aid'], 'all');
-            $list[$k]['pic_path'] = D('ArticlePic')->getDataByAid($v['aid']);
-            $list[$k]['category'] = current(D('Category')->getDataByCid($v['cid'], 'cid,cid,cname'));
+            $list[$k]['tag'] = ArticleTagModel::getInstance()->getDataByAid($v['aid'], 'all');
+            $list[$k]['pic_path'] = ArticlePicModel::getInstance()->getDataByAid($v['aid']);
+            $list[$k]['category'] = current(CategoryModel::getInstance()->getDataByCid($v['cid'], 'cid,cid,cname'));
             $v['content'] = preg_ueditor_image_path($v['content']);
             $list[$k]['content'] = htmlspecialchars($v['content']);
             $list[$k]['url'] = U('Home/Index/article/', array('aid' => $v['aid']));
@@ -274,9 +281,9 @@ class ArticleModel extends BaseModel
         if ($map == '') {
             // $map 为空则不获取上下篇文章
             $data = $this->where(array('aid' => $aid))->find();
-            $data['tids'] = D('ArticleTag')->getDataByAid($aid);
-            $data['tag'] = D('ArticleTag')->getDataByAid($aid, 'all');
-            $data['category'] = current(D('Category')->getDataByCid($data['cid'], 'cid,cid,cname,keywords'));
+            $data['tids'] = ArticleTagModel::getInstance()->getDataByAid($aid);
+            $data['tag'] = ArticleTagModel::getInstance()->getDataByAid($aid, 'all');
+            $data['category'] = current(CategoryModel::getInstance()->getDataByCid($data['cid'], 'cid,cid,cname,keywords'));
             // 获取相对路径的图片地址
             $data['content'] = preg_ueditor_image_path($data['content']);
         } else {
@@ -319,9 +326,9 @@ class ArticleModel extends BaseModel
                 $data['next']['url'] = U('Home/Index/article/', array('aid' => $data['next']['aid']));
             }
             $data['current'] = $this->where(array('aid' => $aid))->find();
-            $data['current']['tids'] = D('ArticleTag')->getDataByAid($aid);
-            $data['current']['tag'] = D('ArticleTag')->getDataByAid($aid, 'all');
-            $data['current']['category'] = current(D('Category')->getDataByCid($data['current']['cid'], 'cid,cid,cname,keywords'));
+            $data['current']['tids'] = ArticleTagModel::getInstance()->getDataByAid($aid);
+            $data['current']['tag'] = ArticleTagModel::getInstance()->getDataByAid($aid, 'all');
+            $data['current']['category'] = current(CategoryModel::getInstance()->getDataByCid($data['current']['cid'], 'cid,cid,cname,keywords'));
             $data['current']['content'] = preg_ueditor_image_path($data['current']['content']);
         }
         return $data;
@@ -334,18 +341,18 @@ class ArticleModel extends BaseModel
             'title' => array('like', "%$search_word%")
         );
         $count = $this->where($map)->count();
-        $page = new \Org\Bjy\Page($count, 10);
+        $page = new Page($count, 10);
         $list = $this
             ->where($map)
             ->order('addtime desc')
             ->limit($page->firstRow . ',' . $page->listRows)
             ->select();
         foreach ($list as $k => $v) {
-            $list[$k]['pic_path'] = D('ArticlePic')->getDataByAid($v['aid']);
+            $list[$k]['pic_path'] = ArticlePicModel::getInstance()->getDataByAid($v['aid']);
             $list[$k]['url'] = U('Home/Index/article/', array('search_word' => $search_word, 'aid' => $v['aid']));
-            $list[$k]['tids'] = D('ArticleTag')->getDataByAid($v['aid']);
-            $list[$k]['tag'] = D('ArticleTag')->getDataByAid($v['aid'], 'all');
-            $list[$k]['category'] = current(D('Category')->getDataByCid($v['cid'], 'cid,cid,cname,keywords'));
+            $list[$k]['tids'] = ArticleTagModel::getInstance()->getDataByAid($v['aid']);
+            $list[$k]['tag'] = ArticleTagModel::getInstance()->getDataByAid($v['aid'], 'all');
+            $list[$k]['category'] = current(CategoryModel::getInstance()->getDataByCid($v['cid'], 'cid,cid,cname,keywords'));
         }
         $show = $page->show();
         $data = array(

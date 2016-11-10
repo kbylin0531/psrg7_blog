@@ -9,11 +9,27 @@
 // | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
 namespace Think;
+use Sharin\Traits\Singleton;
+
 /**
  * ThinkPHP Model模型类
  * 实现了ORM和ActiveRecords模式
+ * @method Model getInstance() static
+ *
+ *
+ * //连贯
+ * @method int count()
+ * @method $this order(string $order)
+ * @method $this alias(string $alias)
+ * 'strict','order','alias','having','group','lock','distinct','auto','filter','validate','result','token','index','force'
+ * //统计
+ * 'count','sum','min','max','avg'
+ * //getbyXXX,getfieldbyXXX
  */
 class Model {
+
+    use Singleton;
+
     // 操作状态
     const MODEL_INSERT          =   1;      //  插入模型数据
     const MODEL_UPDATE          =   2;      //  更新模型数据

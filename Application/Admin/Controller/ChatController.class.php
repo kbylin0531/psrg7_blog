@@ -1,6 +1,8 @@
 <?php
 namespace Admin\Controller;
 use Common\Controller\AdminBaseController;
+use Common\Model\ChatModel;
+
 /**
  * 随言碎语管理
  */
@@ -10,7 +12,7 @@ class ChatController extends AdminBaseController{
 
     public function __construct(){
         parent::__construct();
-        $this->db=D('Chat');
+        $this->db= ChatModel::getInstance();
     }
 
     // 随言碎语列表
