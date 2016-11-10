@@ -1,7 +1,13 @@
 <?php
 namespace Common\Model;
+
+use Org\Bjy\Page;
+
 /**
  * 第三方登陆model
+ * @method OauthUserModel getInstance() static
+ * @method getFieldById(string $p1, string $p2)
+ * @method array|int|string getFieldByOpenid($table, $fields)
  */
 class OauthUserModel extends BaseModel
 {
@@ -37,9 +43,14 @@ class OauthUserModel extends BaseModel
             $id = $this->add($create);
             return $id;
         }
+        return false;
     }
 
-    // 修改数据
+    /**
+     * 修改数据
+     * @param $data
+     * @return array|bool|int|string
+     */
     public function editData($data)
     {
         $openid = $data['openid'];
@@ -50,6 +61,7 @@ class OauthUserModel extends BaseModel
             $this->where(array('openid' => $openid))->save($create);
             return $this->getFieldByOpenid($openid, 'id');
         }
+        return false;
     }
 
     // 传递openid获取单条数据
@@ -62,7 +74,7 @@ class OauthUserModel extends BaseModel
     public function getPageData()
     {
         $count = $this->count();
-        $page = new \Org\Bjy\Page($count, 20);
+        $page = new Page($count, 20);
         $list = $this
             ->order('last_login_time desc')
             ->limit($page->firstRow . ',' . $page->listRows)

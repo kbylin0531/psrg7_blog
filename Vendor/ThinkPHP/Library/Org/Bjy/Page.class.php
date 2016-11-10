@@ -42,9 +42,10 @@ class Page{
 
     /**
      * 架构函数
-     * @param array $totalRows  总的记录数
-     * @param array $listRows  每页显示记录数
-     * @param array $parameter  分页跳转的参数
+     * Page constructor.
+     * @param int $totalRows 总的记录数
+     * @param int $listRows 每页显示记录数
+     * @param array $parameter 分页跳转的参数
      */
     public function __construct($totalRows, $listRows=20, $parameter = array()) {
         C('VAR_PAGE') && $this->p = C('VAR_PAGE'); //设置分页参数名称

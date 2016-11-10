@@ -1,6 +1,9 @@
 <?php
 namespace Common\Controller;
-use Common\Controller\BaseController;
+use Common\Model\CategoryModel;
+use Common\Model\LinkModel;
+use Common\Model\TagModel;
+
 /**
  * 其他通用基类Controller
  */
@@ -12,9 +15,9 @@ class PublicBaseController extends BaseController{
         parent::_initialize();
         // 分配常用数据
         $assign=array(
-            'categorys'=>D('Category')->getAllData(),
-            'tags'=>D('Tag')->getAllData(),
-            'links'=>D('Link')->getDataByState(0,1),
+            'categorys'=>CategoryModel::getInstance()->getAllData(),
+            'tags'=>TagModel::getInstance()->getAllData(),
+            'links'=>LinkModel::getInstance()->getDataByState(0,1),
             );
         $this->assign($assign);
 

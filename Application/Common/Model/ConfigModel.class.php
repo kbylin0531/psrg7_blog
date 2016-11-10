@@ -1,8 +1,9 @@
 <?php
 namespace Common\Model;
-use Common\Model\BaseModel;
 /**
 * 配置项model
+ * @method ConfigModel getInstance() static
+ * @method string|int getFieldByName($table,$name)
 */
 class ConfigModel extends BaseModel{
 
@@ -110,5 +111,6 @@ php;
             $this->error='两次密码不一致';
             return false;
         }
+        return false;
     }
 }
